@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "npx eslint ."
+    "lint": "npx eslint .",
+    "start": "npm run app.js",
+    "dev": "nodemon run app.js"
   },
   "author": "ddmjke",
   "license": "ISC",
@@ -15,6 +17,9 @@
     "eslint-plugin-import": "^2.26.0"
   },
   "dependencies": {
-    "eslint-config-airbnb-base": "^15.0.0"
+    "eslint-config-airbnb-base": "^15.0.0",
+    "express": "^4.18.1",
+    "mongoose": "^6.4.7",
+    "nodemon": "^2.0.19"
   }
 }
