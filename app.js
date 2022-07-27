@@ -13,7 +13,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
 
-app.use('/cards', (req, res, next) => {
+app.use('/', (req, res, next) => {
   req.user = {
     "_id" : "62e13388767a0b954de3dea4"
   };
