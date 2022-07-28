@@ -1,9 +1,13 @@
 const Card = require('../models/card');
 
+const BAD_REQUEST_ERROR = 400;
+const NOT_FOUND_ERROR = 404;
+const DEFAULT_ERROR = 500;
+
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(() => res.status(DEFAULT_ERROR).send({ message: 'internal server error' }));
 };
 
 module.exports.postCard = (req, res) => {
@@ -12,13 +16,20 @@ module.exports.postCard = (req, res) => {
   Card.create({
     name, link, likes, owner: req.user._id,
   })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .then((card) => res.send(card))
+    .catch((err) => {
+      if (err.name === 'ValidationError') res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+      res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+    });
 };
 
 module.exports.deleteCard = (req, res) => {
-  const { _id } = req.body;
-  Card.findOne({ _id }).remove()
-    .catch((err) => res.status(500).send({ message: err.message }));
+  Card.findByIdAndDelete(req.params.cardId)
+    .then(() => res.send())
+    .catch((err) => {
+      if (err.name === 'CastError') res.status(NOT_FOUND_ERROR).send({ message: 'Card not found' });
+      res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+    });
 };
 
 module.exports.likeCard = (req, res) => {
@@ -28,7 +39,11 @@ module.exports.likeCard = (req, res) => {
     { new: true },
   )
     .then(() => res.send())
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'CastError') res.status(NOT_FOUND_ERROR).send({ message: 'Card not found' });
+      if (err.name === 'ValidationError') res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+      res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+    });
 };
 
 module.exports.dislikeCard = (req, res) => {
@@ -38,5 +53,9 @@ module.exports.dislikeCard = (req, res) => {
     { new: true },
   )
     .then(() => res.send())
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'CastError') res.status(NOT_FOUND_ERROR).send({ message: 'Card not found' });
+      if (err.name === 'ValidationError') res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+      res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+    });
 };

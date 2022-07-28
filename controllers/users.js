@@ -1,4 +1,5 @@
 const User = require('../models/user');
+
 const BAD_REQUEST_ERROR = 400;
 const NOT_FOUND_ERROR = 404;
 const DEFAULT_ERROR = 500;
@@ -35,7 +36,7 @@ module.exports.patchUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') res.status(NOT_FOUND_ERROR).send({ message: 'User not found' });
       if (err.name === 'ValidationError') res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
-      res.status(500).send({ message: 'Internal server error' });
+      res.status(DEFAULT_ERROR).send({ message: 'Internal server error' });
     });
 };
 
@@ -46,6 +47,6 @@ module.exports.patchAvatar = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') res.status(NOT_FOUND_ERROR).send({ message: 'User not found' });
       if (err.name === 'ValidationError') res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
-      res.status(500).send({ message: 'Internal server error' });
+      res.status(DEFAULT_ERROR).send({ message: 'Internal server error' });
     });
 };
