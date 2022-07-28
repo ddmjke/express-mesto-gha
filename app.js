@@ -25,6 +25,6 @@ app.use('/', (req, res, next) => {
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-app.use((req, res) => res.status(NOT_FOUND_ERROR).send({ message: 'Bad request' }));
+app.use((req, res) => res.status(NOT_FOUND_ERROR).send({ message: 'Not exists' }));
 
 app.listen(PORT);

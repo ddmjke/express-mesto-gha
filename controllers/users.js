@@ -7,8 +7,11 @@ module.exports.createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
-      res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+      if (err.name === 'ValidationError') {
+        res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+      } else {
+        res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+      }
     });
 };
 
@@ -20,31 +23,53 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUserById = (req, res) => {
   User.findOne({ _id: req.params.userId })
+    .orFail(() => {
+      throw new Error('NotFound');
+    })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError') res.status(NOT_FOUND_ERROR).send({ message: 'User not found' });
-      res.status(DEFAULT_ERROR).send(err.message);
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+      } else if (err.message === 'NotFound') {
+        res.status(NOT_FOUND_ERROR).send({ message: 'User not found' });
+      } else {
+        res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+      }
     });
 };
 
 module.exports.patchUser = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+    .orFail(() => {
+      throw new Error('NotFound');
+    })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError') res.status(NOT_FOUND_ERROR).send({ message: 'User not found' });
-      if (err.name === 'ValidationError') res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
-      res.status(DEFAULT_ERROR).send({ message: 'Internal server error' });
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+      } else if (err.message === 'NotFound') {
+        res.status(NOT_FOUND_ERROR).send({ message: 'User not found' });
+      } else {
+        res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+      }
     });
 };
 
 module.exports.patchAvatar = (req, res) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
+    .orFail(() => {
+      throw new Error('NotFound');
+    })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError') res.status(NOT_FOUND_ERROR).send({ message: 'User not found' });
-      if (err.name === 'ValidationError') res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
-      res.status(DEFAULT_ERROR).send({ message: 'Internal server error' });
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+      } else if (err.message === 'NotFound') {
+        res.status(NOT_FOUND_ERROR).send({ message: 'User not found' });
+      } else {
+        res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+      }
     });
 };
