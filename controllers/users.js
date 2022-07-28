@@ -50,6 +50,8 @@ module.exports.patchUser = (req, res) => {
         res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
       } else if (err.message === 'NotFound') {
         res.status(NOT_FOUND_ERROR).send({ message: 'User not found' });
+      } else if (err.name === 'ValidationError') {
+        res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
       } else {
         res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
       }
