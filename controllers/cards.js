@@ -16,17 +16,28 @@ module.exports.postCard = (req, res) => {
   })
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'ValidationError') res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
-      res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+      if (err.name === 'ValidationError') {
+        res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+      } else {
+        res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+      }
     });
 };
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndDelete(req.params.cardId)
-    .then(() => res.send())
+    .orFail(() => {
+      throw new Error('NotFound');
+    })
+    .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'CastError') res.status(NOT_FOUND_ERROR).send({ message: 'Card not found' });
-      res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+      } else if (err.message === 'NotFound') {
+        res.status(NOT_FOUND_ERROR).send({ message: 'Card not found' });
+      } else {
+        res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+      }
     });
 };
 
@@ -36,11 +47,18 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then(() => res.send())
+    .orFail(() => {
+      throw new Error('NotFound');
+    })
+    .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'CastError') res.status(NOT_FOUND_ERROR).send({ message: 'Card not found' });
-      if (err.name === 'ValidationError') res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
-      res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+      } else if (err.message === 'NotFound') {
+        res.status(NOT_FOUND_ERROR).send({ message: 'Card not found' });
+      } else {
+        res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+      }
     });
 };
 
@@ -50,10 +68,17 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then(() => res.send())
+    .orFail(() => {
+      throw new Error('NotFound');
+    })
+    .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'CastError') res.status(NOT_FOUND_ERROR).send({ message: 'Card not found' });
-      if (err.name === 'ValidationError') res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
-      res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+      } else if (err.message === 'NotFound') {
+        res.status(NOT_FOUND_ERROR).send({ message: 'Card not found' });
+      } else {
+        res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+      }
     });
 };
