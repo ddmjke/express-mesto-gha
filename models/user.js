@@ -1,12 +1,10 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const validator = require('validator');
 
 const SALT_WORK_FACTOR = 10;
 
-const validateEmail = (email) => {
-  const res = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-  return res.test(email);
-};
+const validateEmail = (email) => validator.isEmail(email);
 
 const userSchema = new mongoose.Schema({
   name: {
