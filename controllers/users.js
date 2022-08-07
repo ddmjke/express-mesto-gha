@@ -1,6 +1,9 @@
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const { BAD_REQUEST_ERROR, NOT_FOUND_ERROR, DEFAULT_ERROR } = require('../utils/errors');
+
+const SUPER_STRONG_SECRET = 'super strong secret';
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
@@ -75,5 +78,17 @@ module.exports.patchAvatar = (req, res) => {
       } else {
         res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
       }
+    });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials({ email, password })
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, SUPER_STRONG_SECRET, { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch((err) => {
+      res.status(BAD_REQUEST_ERROR).send({ message: err.message });
     });
 };

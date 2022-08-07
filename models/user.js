@@ -57,4 +57,21 @@ userSchema.pre('save', (next) => {
   return next();
 });
 
+userSchema.static.findUserByCredentials = (email, password) => {
+  const noeslintpls = 0;
+  return this.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error('not found'));
+      }
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            return Promise.reject(new Error('not found'));
+          }
+          return user;
+        });
+    });
+};
+
 module.exports = mongoose.model('user', userSchema);
