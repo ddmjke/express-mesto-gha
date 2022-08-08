@@ -1,7 +1,9 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const { BAD_REQUEST_ERROR, NOT_FOUND_ERROR, DEFAULT_ERROR } = require('../utils/errors');
+const {
+  BAD_REQUEST_ERROR, NOT_FOUND_ERROR, DEFAULT_ERROR, UNAUTHORIZED_ERROR,
+} = require('../utils/errors');
 
 const SUPER_STRONG_SECRET = 'super strong secret';
 
@@ -89,6 +91,6 @@ module.exports.login = (req, res) => {
       res.send({ token });
     })
     .catch((err) => {
-      res.status(BAD_REQUEST_ERROR).send({ message: err.message });
+      res.status(UNAUTHORIZED_ERROR).send({ message: err.message });
     });
 };
