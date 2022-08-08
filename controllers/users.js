@@ -1,11 +1,10 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
+const { SUPER_STRONG_SECRET } = require('../utils/secrets');
 const {
   BAD_REQUEST_ERROR, NOT_FOUND_ERROR, DEFAULT_ERROR, UNAUTHORIZED_ERROR,
 } = require('../utils/errors');
-
-const SUPER_STRONG_SECRET = 'super strong secret';
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
