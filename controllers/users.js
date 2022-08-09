@@ -13,9 +13,9 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('bad request'));
+        next(new BadRequestError());
       } else {
-        next(new DefaultError('internal server error'));
+        next(new DefaultError());
       }
     });
 };
@@ -24,23 +24,23 @@ module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
     .catch(() => {
-      next(new BadRequestError('bad request'));
+      next(new BadRequestError());
     });
 };
 
 module.exports.getUserById = (req, res, next) => {
   User.findOne({ _id: req.params.userId })
     .orFail(() => {
-      throw new Error('NotFound');
+      throw new NotFoundError();
     })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('bad request'));
+        next(new BadRequestError());
       } else if (err.message === 'NotFound') {
         next(new NotFoundError('User not found'));
       } else {
-        next(new DefaultError('internal server error'));
+        next(new DefaultError());
       }
     });
 };
@@ -49,11 +49,11 @@ module.exports.getUser = (req, res, next) => {
   const { user } = req.user;
   User.findById(user._id)
     .orFail(() => {
-      throw new Error('NotFound');
+      throw new NotFoundError();
     })
     .then((usr) => res.send(usr))
     .catch(() => {
-      next(new BadRequestError('bad request'));
+      next(new BadRequestError());
     });
 };
 
@@ -61,16 +61,16 @@ module.exports.patchUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .orFail(() => {
-      throw new Error('NotFound');
+      throw new NotFoundError();
     })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        next(new NotFoundError('not found'));
+        next(new NotFoundError());
       } else if (err.message === 'NotFound') {
         next(new NotFoundError('User not found'));
       } else {
-        next(new DefaultError('internal server error'));
+        next(new DefaultError());
       }
     });
 };
@@ -79,18 +79,18 @@ module.exports.patchAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .orFail(() => {
-      next(new NotFoundError('not found'));
+      next(new NotFoundError());
     })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new NotFoundError('not found'));
+        next(new NotFoundError());
       } else if (err.message === 'NotFound') {
         next(new NotFoundError('User not found'));
       } else if (err.name === 'ValidationError') {
-        next(new NotFoundError('not found'));
+        next(new NotFoundError());
       } else {
-        next(new DefaultError('internal server error'));
+        next(new DefaultError());
       }
     });
 };
@@ -103,6 +103,6 @@ module.exports.login = (req, res, next) => {
       res.send({ token });
     })
     .catch(() => {
-      next(new UnauthorizedError('unauthorized'));
+      next(new UnauthorizedError());
     });
 };

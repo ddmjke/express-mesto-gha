@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const validator = require('validator');
+const NotFoundError = require('../utils/errors/NotFoundError');
 
 const SALT_WORK_FACTOR = 10;
 
@@ -61,11 +62,11 @@ userSchema.pre('save', (next) => {
 userSchema.static.findUserByCredentials = async (email, password) => {
   const user = await this.findOne({ email }).select('+password');
   if (!user) {
-    return Promise.reject(new Error('not found'));
+    return Promise.reject(new NotFoundError());
   }
   const matched = await bcrypt.compare(password, user.password);
   if (!matched) {
-    return Promise.reject(new Error('not found'));
+    return Promise.reject(new NotFoundError());
   }
   return user;
 };

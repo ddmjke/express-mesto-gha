@@ -34,11 +34,11 @@ module.exports.deleteCard = (req, res, next) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('bad request'));
+        next(new BadRequestError());
       } else if (err.message === 'NotFound') {
-        next(new NotFoundError('not found'));
+        next(new NotFoundError());
       } else {
-        next(new DefaultError('internal server error'));
+        next(new DefaultError());
       }
     });
 };
@@ -55,11 +55,11 @@ module.exports.likeCard = (req, res, next) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('bad request'));
+        next(new BadRequestError());
       } else if (err.message === 'NotFound') {
         next(new NotFoundError('Card not found'));
       } else {
-        next(new DefaultError('internal server error'));
+        next(new DefaultError());
       }
     });
 };
@@ -71,16 +71,16 @@ module.exports.dislikeCard = (req, res, next) => {
     { new: true },
   )
     .orFail(() => {
-      throw new NotFoundError('NotFound');
+      throw new NotFoundError();
     })
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('bad request'));
+        next(new BadRequestError());
       } else if (err.message === 'NotFound') {
         next(new NotFoundError('Card not found'));
       } else {
-        next(new DefaultError('internal server error'));
+        next(new DefaultError());
       }
     });
 };
