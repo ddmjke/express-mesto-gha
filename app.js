@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const process = require('process');
 const { NOT_FOUND_ERROR } = require('./utils/errors');
 const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 
 const { PORT = 3000 } = process.env;
 
@@ -19,15 +20,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.post('/signin', login);
 app.post('/signup', createUser);
 
-app.use('/', (req, res, next) => {
-  req.user = {
-    _id: '62e13388767a0b954de3dea4',
-  };
-  next();
-});
-
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
+app.use('/users', auth, require('./routes/users'));
+app.use('/cards', auth, require('./routes/cards'));
 
 app.use((req, res) => res.status(NOT_FOUND_ERROR).send({ message: 'Not exists' }));
 
