@@ -2,30 +2,33 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const { SUPER_STRONG_SECRET } = require('../utils/secrets');
-const {
-  BAD_REQUEST_ERROR, NOT_FOUND_ERROR, DEFAULT_ERROR, UNAUTHORIZED_ERROR,
-} = require('../utils/errors');
 
-module.exports.createUser = (req, res) => {
+const {
+  UnauthorizedError, BadRequestError, DefaultError, NotFoundError,
+} = require('../utils/errors/UnauthorizedError');
+
+module.exports.createUser = (req, res, next) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+        next(new BadRequestError('bad request'));
       } else {
-        res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+        next(new DefaultError('internal server error'));
       }
     });
 };
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch(() => res.status(DEFAULT_ERROR).send({ message: 'internal server error' }));
+    .catch(() => {
+      next(new BadRequestError('bad request'));
+    });
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   User.findOne({ _id: req.params.userId })
     .orFail(() => {
       throw new Error('NotFound');
@@ -33,28 +36,28 @@ module.exports.getUserById = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+        next(new BadRequestError('bad request'));
       } else if (err.message === 'NotFound') {
-        res.status(NOT_FOUND_ERROR).send({ message: 'User not found' });
+        next(new NotFoundError('User not found'));
       } else {
-        res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+        next(new DefaultError('internal server error'));
       }
     });
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   const { user } = req.user;
   User.findById(user._id)
     .orFail(() => {
       throw new Error('NotFound');
     })
     .then((usr) => res.send(usr))
-    .catch((err) => {
-      res.status(BAD_REQUEST_ERROR).send({ message: err.message }); // tbdet
+    .catch(() => {
+      next(new BadRequestError('bad request'));
     });
 };
 
-module.exports.patchUser = (req, res) => {
+module.exports.patchUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .orFail(() => {
@@ -62,46 +65,44 @@ module.exports.patchUser = (req, res) => {
     })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        next(new NotFoundError('not found'));
       } else if (err.message === 'NotFound') {
-        res.status(NOT_FOUND_ERROR).send({ message: 'User not found' });
-      } else if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+        next(new NotFoundError('User not found'));
       } else {
-        res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+        next(new DefaultError('internal server error'));
       }
     });
 };
 
-module.exports.patchAvatar = (req, res) => {
+module.exports.patchAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .orFail(() => {
-      throw new Error('NotFound');
+      next(new NotFoundError('not found'));
     })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+        next(new NotFoundError('not found'));
       } else if (err.message === 'NotFound') {
-        res.status(NOT_FOUND_ERROR).send({ message: 'User not found' });
+        next(new NotFoundError('User not found'));
       } else if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST_ERROR).send({ message: 'Bad request' });
+        next(new NotFoundError('not found'));
       } else {
-        res.status(DEFAULT_ERROR).send({ message: 'internal server error' });
+        next(new DefaultError('internal server error'));
       }
     });
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials({ email, password })
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, SUPER_STRONG_SECRET, { expiresIn: '7d' });
       res.send({ token });
     })
-    .catch((err) => {
-      res.status(UNAUTHORIZED_ERROR).send({ message: err.message });
+    .catch(() => {
+      next(new UnauthorizedError('unauthorized'));
     });
 };
