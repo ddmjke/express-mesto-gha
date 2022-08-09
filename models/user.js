@@ -39,6 +39,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    select: false,
   },
 });
 
@@ -58,7 +59,7 @@ userSchema.pre('save', (next) => {
 });
 
 userSchema.static.findUserByCredentials = async (email, password) => {
-  const user = await this.findOne({ email });
+  const user = await this.findOne({ email }).select('+password');
   if (!user) {
     return Promise.reject(new Error('not found'));
   }

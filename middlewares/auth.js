@@ -3,7 +3,7 @@ const { UNAUTHORIZED_ERROR } = require('../utils/errors');
 const { SUPER_STRONG_SECRET } = require('../utils/secrets');
 
 const handleAuthError = (res) => {
-  res.status(UNAUTHORIZED_ERROR).send({ message: 'unauthorized' });
+  res.status(UNAUTHORIZED_ERROR).send({ message: 'Unauthorized' });
 };
 
 const extractBearer = (header) => header.replace('Bearer ', '');
