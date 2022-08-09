@@ -42,6 +42,18 @@ module.exports.getUserById = (req, res) => {
     });
 };
 
+module.exports.getUser = (req, res) => {
+  const { user } = req.user;
+  User.findById(user._id)
+    .orFail(() => {
+      throw new Error('NotFound');
+    })
+    .then((usr) => res.send(usr))
+    .catch((err) => {
+      res.status(BAD_REQUEST_ERROR).send({ message: err.message }); // tbdet
+    });
+};
+
 module.exports.patchUser = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
