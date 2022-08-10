@@ -13,7 +13,6 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(errors());
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -32,8 +31,10 @@ app.post('/signup', celebrate({
 app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
 
-app.use((err, req, res, next) => {
-  res.status(err.statusCode).send({ message: err.message });
-});
+app.use(errors());
+
+// app.use((err, req, res, next) => {
+//   res.status(err.statusCode).send({ message: err.message });
+// });
 
 app.listen(PORT);

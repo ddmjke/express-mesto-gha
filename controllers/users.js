@@ -18,7 +18,7 @@ module.exports.createUser = (req, res, next) => {
   })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.message === 'Validation failed') {
         next(new BadRequestError());
       } else if (err.code === 11000) {
         next(new ConflictError('Email already in use'));
