@@ -3,9 +3,10 @@ const User = require('../models/user');
 
 const { SUPER_STRONG_SECRET } = require('../utils/secrets');
 
-const {
-  UnauthorizedError, BadRequestError, DefaultError, NotFoundError,
-} = require('../utils/errors/UnauthorizedError');
+const UnauthorizedError = require('../utils/errors/UnauthorizedError');
+const BadRequestError = require('../utils/errors/BadRequestError');
+const DefaultError = require('../utils/errors/DefaultError');
+const NotFoundError = require('../utils/errors/NotFoundError');
 
 module.exports.createUser = (req, res, next) => {
   const { name, about, avatar } = req.body;
