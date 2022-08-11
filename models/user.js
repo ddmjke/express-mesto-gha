@@ -44,9 +44,9 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.pre('save', (next) => {
+userSchema.pre('save', function named(next) {
   const user = this;
-  if (!user.isModified('password')) return next();
+  if (!user.isModified('password')) next();
 
   bcrypt.hash(user.password, SALT_WORK_FACTOR)
     .then((hash) => {
@@ -54,6 +54,7 @@ userSchema.pre('save', (next) => {
       return next();
     })
     .catch(() => next(new Error('hash error')));
+  return next();
 });
 
 userSchema.static.findUserByCredentials = async (email, password) => {
