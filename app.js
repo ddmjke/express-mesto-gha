@@ -40,10 +40,10 @@ app.post('/signup', celebrate({
 app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
 
-app.use(errors());
-
 app.use((err, req, res, next) => {
-  res.status(err.statusCode).send({ message: err.message || 'Not Found' });
+  res.status(err.statusCode).send({ message: err.message });
 });
+
+app.use(errors());
 
 app.listen(PORT);
