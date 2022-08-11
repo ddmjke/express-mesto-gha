@@ -23,6 +23,7 @@ module.exports.createUser = (req, res, next) => {
       } else if (err.code === 11000) {
         next(new ConflictError('Email already in use'));
       } else {
+        console.log(err);
         next(new DefaultError());
       }
     });
