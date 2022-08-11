@@ -7,7 +7,7 @@ const extractBearer = (header) => header.replace('Bearer ', '');
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return next(new UnauthorizedError('Unauthorized'));
+    next(new UnauthorizedError('Unauthorized'));
   }
   const token = extractBearer(authorization);
   let payload;
@@ -15,9 +15,8 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, require('../utils/secrets'));
   } catch (err) {
-    return next(new UnauthorizedError('Unauthorized'));
+    next(new UnauthorizedError('Unauthorized'));
   }
-
   req.user = payload;
-  return next();
+  next();
 };

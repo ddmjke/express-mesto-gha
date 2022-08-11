@@ -63,10 +63,9 @@ module.exports.getUserById = (req, res, next) => {
 };
 
 module.exports.getUser = (req, res, next) => {
-  const { user } = req.user;
-  User.findById(user._id)
+  User.findById(req.user._id)
     .orFail(() => {
-      throw new NotFoundError();
+      next(new NotFoundError());
     })
     .then((usr) => res.send(usr))
     .catch(() => {
