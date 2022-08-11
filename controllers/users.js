@@ -124,7 +124,7 @@ module.exports.login = (req, res, next) => {
             if (!matches) {
               throw new UnauthorizedError();
             } else {
-              const token = jwt.sign({ _id: user._id }, require('../utils/secrets'), { expiresIn: '7d' });
+              const token = jwt.sign({ _id: user._id }, 'super_strong_secret', { expiresIn: '7d' });
               res.send({ token });
             }
           })

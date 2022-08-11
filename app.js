@@ -46,7 +46,7 @@ app.use('/*', () => { throw new NotFoundError(); });
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
+app.use((err, req, res, _) => {
   res.status(err.statusCode).send({ message: err.message });
 });
 
