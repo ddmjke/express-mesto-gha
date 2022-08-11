@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const User = require('../models/user');
 
-const { SUPER_STRONG_SECRET } = require('../utils/secrets');
+// const { SUPER_STRONG_SECRET } = require('../utils/secrets');
 
 const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 const BadRequestError = require('../utils/errors/BadRequestError');
@@ -113,12 +114,23 @@ module.exports.patchAvatar = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  return User.findUserByCredentials({ email, password })
+
+  User.findOne({ email }).select('+password')
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, SUPER_STRONG_SECRET, { expiresIn: '7d' });
-      res.send({ token });
+      if (!user) {
+        throw new UnauthorizedError();
+      } else {
+        bcrypt.compare(password, user.password)
+          .then((matches) => {
+            if (!matches) {
+              throw new UnauthorizedError();
+            } else {
+              const token = jwt.sign({ _id: user._id }, require('../utils/secrets'), { expiresIn: '7d' });
+              res.send({ token });
+            }
+          })
+          .catch(next);
+      }
     })
-    .catch(() => {
-      next(new UnauthorizedError());
-    });
+    .catch(next);
 };
