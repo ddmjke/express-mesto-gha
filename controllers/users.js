@@ -16,14 +16,21 @@ module.exports.createUser = (req, res, next) => {
   User.create({
     name, about, avatar, email, password,
   })
-    .then((user) => res.send(user))
+    .then((user) => {
+      res.status(201).send({
+        _id: user.id,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+      });
+    })
     .catch((err) => {
       if (err.message === 'Validation failed') {
         next(new BadRequestError());
       } else if (err.code === 11000) {
         next(new ConflictError('Email already in use'));
       } else {
-        console.log(err);
         next(new DefaultError());
       }
     });
