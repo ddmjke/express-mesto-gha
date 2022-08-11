@@ -48,7 +48,7 @@ module.exports.getUsers = (req, res, next) => {
 module.exports.getUserById = (req, res, next) => {
   User.findOne({ _id: req.params.userId })
     .orFail(() => {
-      throw new NotFoundError();
+      next(new NotFoundError());
     })
     .then((user) => res.send(user))
     .catch((err) => {

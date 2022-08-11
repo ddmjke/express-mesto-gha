@@ -2,6 +2,7 @@ const Card = require('../models/card');
 const BadRequestError = require('../utils/errors/BadRequestError');
 const DefaultError = require('../utils/errors/DefaultError');
 const NotFoundError = require('../utils/errors/NotFoundError');
+const ForbiddenError = require('../utils/errors/ForbiddenError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -26,10 +27,16 @@ module.exports.postCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndDelete(req.params.cardId)
+  Card.findById(req.params.cardId)
     .orFail(() => {
-      throw new Error('NotFound');
+      next(new NotFoundError());
     })
+    .then((card) => {
+      if (!(card.owner === req.user._id)) {
+        next(new ForbiddenError());
+      }
+    });
+  Card.findByIdAndDelete(req.params.cardId)
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -49,7 +56,7 @@ module.exports.likeCard = (req, res, next) => {
     { new: true },
   )
     .orFail(() => {
-      throw new Error('NotFound');
+      next(new NotFoundError());
     })
     .then((card) => res.send(card))
     .catch((err) => {
@@ -70,7 +77,7 @@ module.exports.dislikeCard = (req, res, next) => {
     { new: true },
   )
     .orFail(() => {
-      throw new NotFoundError();
+      next(new NotFoundError());
     })
     .then((card) => res.send(card))
     .catch((err) => {
