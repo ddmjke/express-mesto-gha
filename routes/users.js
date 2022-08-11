@@ -12,7 +12,7 @@ router.patch('/me', patchUser);
 
 router.get('/:userId', celebrate({
   params: Joi.object().keys({
-    userId: Joi.objectId(),
+    userId: Joi.string().hex().length(24),
   }),
 }), getUserById);
 
