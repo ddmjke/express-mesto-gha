@@ -32,21 +32,22 @@ module.exports.deleteCard = (req, res, next) => {
       next(new NotFoundError());
     })
     .then((card) => {
-      if (!(card.owner === req.user._id)) {
+      if (!(card.owner._id === req.user._id)) {
         next(new ForbiddenError());
       }
-    });
-  Card.findByIdAndDelete(req.params.cardId)
-    .then((card) => res.send(card))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError());
-      } else if (err.message === 'NotFound') {
-        next(new NotFoundError());
-      } else {
-        next(new DefaultError());
-      }
-    });
+      Card.findByIdAndDelete(req.params.cardId)
+        .then((deleted) => res.send(deleted))
+        .catch((err) => {
+          if (err.name === 'CastError') {
+            next(new BadRequestError());
+          } else if (err.message === 'NotFound') {
+            next(new NotFoundError());
+          } else {
+            next(new DefaultError());
+          }
+        });
+    })
+    .catch(next);
 };
 
 module.exports.likeCard = (req, res, next) => {
