@@ -42,7 +42,7 @@ app.use('/users', auth, require('./routes/users'));
 
 app.use('/cards', auth, require('./routes/cards'));
 
-app.use('/', () => { throw new NotFoundError(); });
+app.use('/*', () => { throw new NotFoundError(); });
 
 app.use(errors());
 
