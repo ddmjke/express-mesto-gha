@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const UnauthorizedError = require('../utils/errors/UnauthorizedError');
-const { SUPER_STRONG_SECRET } = require('../utils/secrets');
+// const { SUPER_STRONG_SECRET } = require('../utils/secrets');
 
 const extractBearer = (header) => header.replace('Bearer ', '');
 
@@ -13,7 +13,7 @@ module.exports = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, SUPER_STRONG_SECRET);
+    payload = jwt.verify(token, require('../utils/secrets'));
   } catch (err) {
     return next(new UnauthorizedError('Unauthorized'));
   }
