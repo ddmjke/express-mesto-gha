@@ -6,6 +6,7 @@ const NotFoundError = require('../utils/errors/NotFoundError');
 const SALT_WORK_FACTOR = 10;
 
 const validateEmail = (email) => validator.isEmail(email);
+const validateUrl = (link) => validator.isURL(link);
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -25,6 +26,10 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    validate: {
+      validator: validateUrl,
+      message: 'Неправильный формат почты',
+    },
   },
 
   email: {

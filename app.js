@@ -21,9 +21,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(linkRegEx),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
@@ -42,12 +39,12 @@ app.use('/users', auth, require('./routes/users'));
 
 app.use('/cards', auth, require('./routes/cards'));
 
-app.use('/*', () => { throw new NotFoundError(); });
+app.use('/*', auth, () => { throw new NotFoundError(); });
 
 app.use(errors());
 
 app.use((err, req, res, _) => {
-  res.status(err.statusCode).send({ message: err.message });
+  res.status(err.statusCode || 500).send({ message: err.message || 'Internal server error' });
 });
 
 app.listen(PORT);
