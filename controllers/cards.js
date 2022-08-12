@@ -35,7 +35,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (!(card.owner.equals(req.user._id))) {
         return next(new ForbiddenError());
       }
-      Card.deleteOne(req.params.cardId)
+      Card.deleteOne({ _id: req.params.cardId })
         .then((deleted) => res.send(deleted))
         .catch((err) => {
           if (err.name === 'CastError') {
