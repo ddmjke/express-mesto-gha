@@ -46,7 +46,6 @@ module.exports.deleteCard = (req, res, next) => {
             next(new DefaultError());
           }
         });
-      return next();
     })
     .catch(next);
 };
