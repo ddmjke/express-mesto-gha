@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const UnauthorizedError = require('../utils/errors/UnauthorizedError');
-// const { SUPER_STRONG_SECRET } = require('../utils/secrets');
 
 const extractBearer = (header) => header.replace('Bearer ', '');
 
