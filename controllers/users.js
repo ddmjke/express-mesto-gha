@@ -117,12 +117,12 @@ module.exports.login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        next(new UnauthorizedError());
+        throw new UnauthorizedError();
       } else {
         bcrypt.compare(password, user.password)
           .then((matches) => {
             if (!matches) {
-              next(new UnauthorizedError());
+              throw new UnauthorizedError();
             } else {
               const token = jwt.sign({ _id: user._id }, 'super_strong_secret', { expiresIn: '7d' });
               res.send({ token });
