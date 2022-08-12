@@ -33,7 +33,7 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .then((card) => {
       if (!(card.owner.equals(req.user._id))) {
-        return next(new ForbiddenError());
+        next(new ForbiddenError());
       }
       Card.deleteOne({ _id: req.params.cardId })
         .then((deleted) => res.send(deleted))
@@ -46,7 +46,7 @@ module.exports.deleteCard = (req, res, next) => {
             next(new DefaultError());
           }
         });
-      return next();
+      next();
     })
     .catch(next);
 };
