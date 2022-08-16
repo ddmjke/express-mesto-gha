@@ -33,7 +33,6 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .then((card) => {
       if (!(card.owner.equals(req.user._id))) {
-        // actualy works, unlike review solution
         throw new ForbiddenError();
       }
       card.remove()
