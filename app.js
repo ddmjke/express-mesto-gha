@@ -8,6 +8,7 @@ const rateLimit = require('express-rate-limit');
 
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const linkRegEx = require('./utils/regexes');
 const NotFoundError = require('./utils/errors/NotFoundError');
 
@@ -28,6 +29,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
+
+app.use(requestLogger);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -50,6 +53,8 @@ app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
 
 app.use('/*', auth, () => { throw new NotFoundError(); });
+
+app.use(errorLogger);
 
 app.use(errors());
 
